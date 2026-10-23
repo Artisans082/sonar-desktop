@@ -68,8 +68,6 @@ dotnet run --project Sonar.Desktop\Sonar.Desktop.csproj
 
 ### 打包单文件 exe
 
-需要在源码目录执行，产物输出到本地 `dist\`（仅本地生成，不会进入版本库）：
-
 ```powershell
 dotnet publish Sonar.Desktop\Sonar.Desktop.csproj -c Release -r win-x64 `
   --self-contained false -p:PublishSingleFile=true `
