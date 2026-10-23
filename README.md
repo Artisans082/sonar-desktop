@@ -47,32 +47,43 @@
 
 | 场景 | 要求 |
 |------|------|
-| 运行已发布的 exe | Windows 10 / 11，.NET 10 Desktop Runtime |
-| 从源码构建 | Windows 10 / 11，.NET 10 SDK |
+| 运行发布包 | Windows 10 / 11，[.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) |
+| 从源码构建 | Windows 10 / 11，[.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) |
 
-### 直接运行
+> 仓库**不提交编译产物**：`dist/`、`*.exe`、`*.pdb` 均已加入 `.gitignore`。
+> 因此请从源码构建运行，或从 [Releases](https://github.com/Artisans082/sonar-desktop/releases) 下载已打包的单文件程序。
 
-```powershell
-.\dist\Sonar.exe
-```
-
-`dist/Sonar.exe` 是框架依赖的单文件发布版（约 1.2 MB），双击即可启动。
-若提示缺少运行时，请先安装 .NET 10 Desktop Runtime，或按下方步骤从源码运行。
-
-### 从源码构建
+### 从源码运行（推荐）
 
 ```powershell
+# 克隆
+git clone https://github.com/Artisans082/sonar-desktop.git
+cd sonar-desktop
+
 # 构建
 dotnet build Sonar.slnx -c Release
 
 # 运行
 dotnet run --project Sonar.Desktop\Sonar.Desktop.csproj
+```
 
-# 发布单文件 exe
+### 打包单文件 exe
+
+需要在源码目录执行，产物输出到本地 `dist\`（仅本地生成，不会进入版本库）：
+
+```powershell
 dotnet publish Sonar.Desktop\Sonar.Desktop.csproj -c Release -r win-x64 `
   --self-contained false -p:PublishSingleFile=true `
   -p:IncludeNativeLibrariesForSelfExtract=true -o dist
 ```
+
+生成的 `dist\Sonar.exe` 约 1.2 MB，为框架依赖版本，双击即可启动；
+若提示缺少运行时，请先安装 .NET 10 Desktop Runtime。
+
+### 从 Releases 下载
+
+前往 [Releases](https://github.com/Artisans082/sonar-desktop/releases) 下载 `Sonar.exe`，双击运行即可，无需构建。
+若 Releases 中暂无可用版本，请按上方「从源码运行」操作。
 
 ## 首次使用
 
@@ -86,8 +97,6 @@ dotnet publish Sonar.Desktop\Sonar.Desktop.csproj -c Release -r win-x64 `
 
 ```text
 sonar0.3/
-├── dist/
-│   └── Sonar.exe                    # 已发布的单文件程序
 ├── Sonar.Desktop/
 │   ├── App.xaml / App.xaml.cs        # 应用入口
 │   ├── MainWindow.xaml / .cs         # 红黑主界面（主页 / 设置 / 历史）
