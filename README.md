@@ -50,8 +50,7 @@
 | 运行发布包 | Windows 10 / 11，[.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) |
 | 从源码构建 | Windows 10 / 11，[.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) |
 
-> 仓库**不提交编译产物**：`dist/`、`*.exe`、`*.pdb` 均已加入 `.gitignore`。
-> 因此请从源码构建运行，或从 [Releases](https://github.com/Artisans082/sonar-desktop/releases) 下载已打包的单文件程序。
+> 请从源码构建运行，或从 [Releases](https://github.com/Artisans082/sonar-desktop/releases) 下载已打包的单文件程序。
 
 ### 从源码运行（推荐）
 
