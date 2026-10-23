@@ -1,0 +1,24 @@
+# C# / WPF build artifacts
+**/bin/
+**/obj/
+.vs/
+*.user
+*.suo
+
+# 发布产物（改用 GitHub Releases 分发）
+dist/
+*.exe
+*.pdb
+
+# 运行期配置与数据（默认位于 ~/.sonar，这里兜底防止误提交）
+config.json
+.sonar/
+sonar-config.json
+声呐数据_*
+声呐报告_*
+*.local.json
+*.cookies.sqlite
+
+# OS
+Thumbs.db
+.DS_Store

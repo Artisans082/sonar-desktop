@@ -1,0 +1,37 @@
+MIT License
+
+Copyright (c) 2026 Sonar Contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+## 第三方组件说明
+
+本项目的贴吧采集功能参考了以下以 MIT License 发布的开源项目的**协议规格**
+（未复制其源代码，详见 docs/reference-aiotieba.md）：
+
+- aiotieba — Copyright (c) lumina37 — https://github.com/lumina37/aiotieba
+- aiotieba-go — Copyright (c) rongyuio — https://github.com/rongyuio/aiotieba-go
+
+运行时依赖（均为各自许可证）：
+
+- requests — Apache License 2.0
+- beautifulsoup4 — MIT License
+- pycryptodomex — BSD 2-Clause / Public Domain

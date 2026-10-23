@@ -1,0 +1,882 @@
+<Window x:Class="Sonar.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:Sonar.Controls"
+        Title="声呐 Sonar — B站 &amp; 贴吧 舆情分析"
+        Icon="Assets/sonar.ico"
+        Width="1400" Height="920" MinWidth="1200" MinHeight="840"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None" ResizeMode="CanResize"
+        Background="{StaticResource BgBrush}"
+        UseLayoutRounding="True"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="ClearType">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0" ResizeBorderThickness="6"
+                      GlassFrameThickness="0" CornerRadius="0"
+                      UseAeroCaptionButtons="False"/>
+    </WindowChrome.WindowChrome>
+
+    <Border BorderBrush="#2A2A33" BorderThickness="1" Background="{StaticResource BgBrush}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="44"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="28"/>
+            </Grid.RowDefinitions>
+
+            <!-- ================= 标题栏 ================= -->
+            <Border Grid.Row="0" Background="{StaticResource SidebarBrush}"
+                    MouseLeftButtonDown="OnTitleBarMouseDown">
+                <Grid>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
+                        <Border Width="28" Height="28" CornerRadius="7" Margin="0,0,10,0"
+                                Background="#0A0A0C" BorderBrush="#33333C" BorderThickness="1"
+                                ClipToBounds="True">
+                            <Image Source="Assets/sonar.png" Stretch="UniformToFill"
+                                   RenderOptions.BitmapScalingMode="HighQuality"/>
+                        </Border>
+                        <TextBlock Text="声呐" FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
+                        <TextBlock Text="SONAR" FontSize="11" Foreground="{StaticResource AccentHoverBrush}"
+                                   FontWeight="SemiBold" Margin="6,1,0,0" VerticalAlignment="Center"
+                                   FontFamily="{StaticResource DisplayFont}"/>
+                        <Border Width="1" Height="14" Background="{StaticResource BorderBrush}"
+                                Margin="12,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="B站 &amp; 贴吧 舆情分析" FontSize="11.5"
+                                   Foreground="{StaticResource TextMutedBrush}" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
+                                VerticalAlignment="Center" Margin="0,0,6,0">
+                        <Button Content="—" Style="{StaticResource TitleBarButton}" Click="OnMinimizeClick"
+                                ToolTip="最小化"/>
+                        <Button x:Name="MaximizeButton" Content="□" Style="{StaticResource TitleBarButton}"
+                                Click="OnMaximizeClick" ToolTip="最大化 / 还原"/>
+                        <Button Content="✕" Style="{StaticResource CloseTitleBarButton}"
+                                Click="OnCloseClick" ToolTip="关闭"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- ================= 主体 ================= -->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="212"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- 侧边栏 -->
+                <Border Grid.Column="0" Background="{StaticResource SidebarBrush}"
+                        BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,1,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="工作台" FontSize="10.5" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextMutedBrush}" Margin="20,16,0,8"/>
+
+                        <StackPanel Grid.Row="1">
+                            <RadioButton x:Name="NavAnalyze" Style="{StaticResource NavRadio}"
+                                         GroupName="Nav" IsChecked="True" Checked="OnNavChecked"
+                                         Tag="main">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="◈" FontSize="14" Margin="0,0,10,0"
+                                               Foreground="{StaticResource AccentHoverBrush}"/>
+                                    <TextBlock Text="搜索分析" VerticalAlignment="Center"
+                                               Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavSettings" Style="{StaticResource NavRadio}"
+                                         GroupName="Nav" Checked="OnNavChecked" Tag="settings">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="⚙" FontSize="14" Margin="0,0,10,0"
+                                               Foreground="{StaticResource TextDimBrush}"/>
+                                    <TextBlock Text="设置" VerticalAlignment="Center"
+                                               Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavHistory" Style="{StaticResource NavRadio}"
+                                         GroupName="Nav" Checked="OnNavChecked" Tag="history">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="▤" FontSize="14" Margin="0,0,10,0"
+                                               Foreground="{StaticResource TextDimBrush}"/>
+                                    <TextBlock Text="历史归档" VerticalAlignment="Center"
+                                               Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"/>
+                                </StackPanel>
+                            </RadioButton>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" VerticalAlignment="Bottom" Margin="14,0,14,12">
+                            <Border Background="{StaticResource CardBrush}" BorderBrush="{StaticResource BorderBrush}"
+                                    BorderThickness="1" CornerRadius="9" Padding="12,10">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Ellipse x:Name="LlmDot" Width="7" Height="7"
+                                                 Fill="{StaticResource WarningBrush}" VerticalAlignment="Center"
+                                                 Margin="0,0,7,0"/>
+                                        <TextBlock Text="LLM" FontSize="10.5" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextDimBrush}"/>
+                                    </StackPanel>
+                                    <TextBlock x:Name="ModelStatusText" Text="未配置 API Key"
+                                               FontSize="11" Foreground="{StaticResource TextBrush}"
+                                               Margin="0,6,0,0" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock x:Name="ModelBaseText" Text=""
+                                               FontSize="9.5" Foreground="{StaticResource TextMutedBrush}"
+                                               Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <TextBlock Grid.Row="3" Text="v0.3.0" FontSize="9.5"
+                                   Foreground="{StaticResource TextMutedBrush}" Margin="20,0,0,14"/>
+                    </Grid>
+                </Border>
+
+                <!-- 页面容器 -->
+                <Grid Grid.Column="1" x:Name="PageHost">
+
+                    <!-- ============ 主页 ============ -->
+                    <Grid x:Name="MainPage" Margin="24,16,24,12">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- 页头 -->
+                        <Grid Grid.Row="0" Margin="0,0,0,12">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                                <TextBlock Text="搜索分析" Style="{StaticResource H1Text}"/>
+                                <TextBlock Text="LLM 自主采集 B站 &amp; 贴吧 数据并生成舆情分析报告"
+                                           Foreground="{StaticResource TextMutedBrush}" FontSize="11.5"
+                                           Margin="14,0,0,3" VerticalAlignment="Bottom"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
+                                        VerticalAlignment="Bottom">
+                                <TextBlock x:Name="HeaderUsageText" Text="" FontSize="11"
+                                           Foreground="{StaticResource TextMutedBrush}"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- 模式选择 -->
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
+                            <RadioButton x:Name="ModeKeyword" Style="{StaticResource ModeRadio}"
+                                         GroupName="Mode" IsChecked="True" Checked="OnModeChecked" Tag="keyword">
+                                <StackPanel MinWidth="190">
+                                    <TextBlock Text="◈ 关键词综合分析" FontSize="13" FontWeight="SemiBold"/>
+                                    <TextBlock Text="检索 B站 + 贴吧，综合研判舆论"
+                                               FontSize="10.5" Foreground="{StaticResource TextMutedBrush}"
+                                               Margin="0,3,0,0"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="ModeSingleVideo" Style="{StaticResource ModeRadio}"
+                                         GroupName="Mode" Checked="OnModeChecked" Tag="single_video">
+                                <StackPanel MinWidth="180">
+                                    <TextBlock Text="▣ 单视频深度分析" FontSize="13" FontWeight="SemiBold"/>
+                                    <TextBlock Text="输入 BV 号，深挖评论区"
+                                               FontSize="10.5" Foreground="{StaticResource TextMutedBrush}"
+                                               Margin="0,3,0,0"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="ModeOverview" Style="{StaticResource ModeRadio}"
+                                         GroupName="Mode" Checked="OnModeChecked" Tag="bili_overview">
+                                <StackPanel MinWidth="180">
+                                    <TextBlock Text="▤ B站相关视频概览" FontSize="13" FontWeight="SemiBold"/>
+                                    <TextBlock Text="横向总结多个视频的观点"
+                                               FontSize="10.5" Foreground="{StaticResource TextMutedBrush}"
+                                               Margin="0,3,0,0"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <TextBlock x:Name="ModeDescText" Text="" FontSize="10.5"
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       VerticalAlignment="Center" Margin="10,6,0,0"/>
+                        </StackPanel>
+
+                        <!-- 输入卡片 -->
+                        <Border Grid.Row="2" Style="{StaticResource Card}" Padding="18,14">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- 关键词 / 平台 -->
+                                <StackPanel x:Name="KeywordPanel" Grid.Row="0">
+                                    <Grid Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="190"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="平台/吧名" Style="{StaticResource FieldLabelText}"
+                                                   Foreground="{StaticResource TiebaBrush}" FontWeight="SemiBold"
+                                                   Margin="0,0,8,0"/>
+                                        <TextBox x:Name="PlatformBox" Grid.Column="1" Style="{StaticResource DarkTextBox}"
+                                                 Height="36" VerticalContentAlignment="Center"
+                                                 ToolTip="贴吧会先按这个词检索吧名，再在吧内搜关键词"
+                                                 KeyDown="OnInputKeyDown"/>
+                                        <TextBlock Grid.Column="2" Text="关键词" Style="{StaticResource FieldLabelText}"
+                                                   Foreground="{StaticResource AccentHoverBrush}" FontWeight="SemiBold"
+                                                   Margin="16,0,8,0"/>
+                                        <TextBox x:Name="KeywordBox" Grid.Column="3" Style="{StaticResource DarkTextBox}"
+                                                 Height="36" VerticalContentAlignment="Center"
+                                                 ToolTip="分析主体；可用 平台词+核心词+版本号 精确标注"
+                                                 KeyDown="OnInputKeyDown"/>
+                                        <TextBlock Grid.Column="4" Text="吧名 → 搜吧；关键词 → 搜帖/视频标题"
+                                                   FontSize="10.5" Foreground="{StaticResource TextMutedBrush}"
+                                                   VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                    </Grid>
+
+                                    <!-- 时效窗口 -->
+                                    <Grid Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="时效窗口" Style="{StaticResource FieldLabelText}"
+                                                   Foreground="{StaticResource WarningBrush}" FontWeight="SemiBold"
+                                                   Margin="0,0,8,0"/>
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                            <controls:NumericBox x:Name="WinYears" Width="56" Minimum="0" Maximum="10"
+                                                                 Value="0" Suffix="年" Margin="0,0,5,0"
+                                                                 ValueChanged="OnTimeWindowValueChanged"/>
+                                            <controls:NumericBox x:Name="WinMonths" Width="56" Minimum="0" Maximum="23"
+                                                                 Value="0" Suffix="月" Margin="0,0,5,0"
+                                                                 ValueChanged="OnTimeWindowValueChanged"/>
+                                            <controls:NumericBox x:Name="WinDays" Width="62" Minimum="0" Maximum="365"
+                                                                 Value="90" Suffix="天" Margin="0,0,5,0"
+                                                                 ValueChanged="OnTimeWindowValueChanged"/>
+                                            <controls:NumericBox x:Name="WinHours" Width="66" Minimum="0" Maximum="23"
+                                                                 Value="0" Suffix="时" Margin="0,0,8,0"
+                                                                 ValueChanged="OnTimeWindowValueChanged"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                            <Button Content="不限" Style="{StaticResource ChipButton}" Tag="0,0,0,0"
+                                                    Click="OnQuickWindowClick" Margin="0,0,4,0"/>
+                                            <Button Content="24 小时" Style="{StaticResource ChipButton}" Tag="0,0,1,0"
+                                                    Click="OnQuickWindowClick" Margin="0,0,4,0"/>
+                                            <Button Content="7 天" Style="{StaticResource ChipButton}" Tag="0,0,7,0"
+                                                    Click="OnQuickWindowClick" Margin="0,0,4,0"/>
+                                            <Button Content="30 天" Style="{StaticResource ChipButton}" Tag="0,0,30,0"
+                                                    Click="OnQuickWindowClick" Margin="0,0,4,0"/>
+                                            <Button Content="90 天" Style="{StaticResource ChipButton}" Tag="0,0,90,0"
+                                                    Click="OnQuickWindowClick" Margin="0,0,4,0"/>
+                                            <Button Content="1 年" Style="{StaticResource ChipButton}" Tag="1,0,0,0"
+                                                    Click="OnQuickWindowClick" Margin="0,0,10,0"/>
+                                            <TextBlock x:Name="TimeWindowLabel" Text="当前：近 90 天"
+                                                       Foreground="{StaticResource SuccessBrush}" FontSize="10.5"
+                                                       VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+
+                                <!-- 单视频输入 -->
+                                <StackPanel x:Name="VideoPanel" Grid.Row="0" Visibility="Collapsed" Margin="0,0,0,8">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="视频链接" Style="{StaticResource FieldLabelText}"
+                                                   Foreground="{StaticResource AccentHoverBrush}" FontWeight="SemiBold"
+                                                   Margin="0,0,8,0"/>
+                                        <TextBox x:Name="VideoBox" Grid.Column="1" Style="{StaticResource DarkTextBox}"
+                                                 Height="36" VerticalContentAlignment="Center"
+                                                 ToolTip="支持 BV 号或完整视频 URL" KeyDown="OnInputKeyDown"/>
+                                        <TextBlock Grid.Column="2" Text="输入 BV 号或视频 URL"
+                                                   FontSize="10.5" Foreground="{StaticResource TextMutedBrush}"
+                                                   VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                    </Grid>
+                                </StackPanel>
+
+                                <!-- 平台与采集深度 -->
+                                <Grid Grid.Row="1" Margin="0,0,0,10">
+                                    <StackPanel Orientation="Horizontal">
+                                        <CheckBox x:Name="BiliCheck" Content="B站" Style="{StaticResource DarkCheckBox}"
+                                                  IsChecked="True" Margin="0,0,16,0" VerticalAlignment="Center"/>
+                                        <CheckBox x:Name="TiebaCheck" Content="贴吧" Style="{StaticResource DarkCheckBox}"
+                                                  IsChecked="True" Margin="0,0,18,0" VerticalAlignment="Center"/>
+                                        <Border Width="1" Height="16" Background="{StaticResource BorderBrush}"
+                                                Margin="0,0,18,0"/>
+                                        <TextBlock Text="采集深度" Style="{StaticResource FieldLabelText}"
+                                                   Margin="0,0,10,0"/>
+                                        <TextBlock Text="B站页数" Style="{StaticResource FieldLabelText}"
+                                                   Margin="0,0,5,0"/>
+                                        <controls:NumericBox x:Name="BiliPages" Width="56" Minimum="1" Maximum="10"
+                                                             Value="2" Margin="0,0,12,0"/>
+                                        <TextBlock Text="评论数" Style="{StaticResource FieldLabelText}"
+                                                   Margin="0,0,5,0"/>
+                                        <controls:NumericBox x:Name="BiliComments" Width="62" Minimum="0" Maximum="100"
+                                                             Value="30" Margin="0,0,12,0"/>
+                                        <StackPanel x:Name="TiebaDepthPanel" Orientation="Horizontal">
+                                            <TextBlock Text="贴吧页数" Style="{StaticResource FieldLabelText}"
+                                                       Margin="0,0,5,0"/>
+                                            <controls:NumericBox x:Name="TiebaPages" Width="56" Minimum="1" Maximum="10"
+                                                                 Value="3" Margin="0,0,12,0"/>
+                                            <TextBlock Text="回复数" Style="{StaticResource FieldLabelText}"
+                                                       Margin="0,0,5,0"/>
+                                            <controls:NumericBox x:Name="TiebaReplies" Width="62" Minimum="0" Maximum="100"
+                                                                 Value="20"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- 操作按钮 -->
+                                <Grid Grid.Row="2">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button x:Name="AnalyzeButton" Content="🚀  一键分析"
+                                                Style="{StaticResource PrimaryButton}"
+                                                Width="160" Height="40" FontSize="13"
+                                                Click="OnAnalyzeClick"/>
+                                        <Button Content="清空数据" Style="{StaticResource SecondaryButton}"
+                                                Height="40" Margin="8,0,0,0" Click="OnClearClick"/>
+                                        <Button Content="导出报告" Style="{StaticResource SecondaryButton}"
+                                                Height="40" Margin="16,0,0,0" Click="OnExportReportClick"/>
+                                        <Button Content="导出数据" Style="{StaticResource SecondaryButton}"
+                                                Height="40" Margin="8,0,0,0" Click="OnExportDataClick"/>
+                                    </StackPanel>
+                                    <TextBlock x:Name="UsageText" Text="" HorizontalAlignment="Right"
+                                               VerticalAlignment="Center" FontSize="11"
+                                               Foreground="{StaticResource TextMutedBrush}"/>
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <!-- 活动日志 -->
+                        <Border Grid.Row="3" Style="{StaticResource Card}" Padding="14,10" Margin="0,10,0,10">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="98"/>
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="0" Margin="0,0,0,4">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Border Width="3" Height="13" CornerRadius="1.5"
+                                                Background="{StaticResource AccentBrush}" Margin="0,0,8,0"/>
+                                        <TextBlock Text="LLM 活动日志" Style="{StaticResource CardTitleText}"/>
+                                        <TextBlock x:Name="ActivityStatusText" Text="就绪" FontSize="10.5"
+                                                   Foreground="{StaticResource TextMutedBrush}"
+                                                   VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                    </StackPanel>
+                                    <Button Content="清空日志" Style="{StaticResource LinkButton}"
+                                            HorizontalAlignment="Right" Click="OnClearActivityClick"/>
+                                </Grid>
+                                <ListBox x:Name="ActivityList" Grid.Row="1" Margin="0,2,0,0"
+                                         ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="{Binding Time}" FontSize="10.5"
+                                                           Foreground="{StaticResource TextMutedBrush}"
+                                                           FontFamily="{StaticResource MonoFont}"
+                                                           Margin="0,1,8,0"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding Prefix}" FontSize="11.5"
+                                                           Foreground="{Binding Brush}" FontWeight="SemiBold"
+                                                           Margin="0,0,6,0"/>
+                                                <TextBlock Grid.Column="2" Text="{Binding Text}" FontSize="11.5"
+                                                           Foreground="{Binding TextBrush}" TextWrapping="Wrap"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </Grid>
+                        </Border>
+
+                        <!-- 数据 & 报告 -->
+                        <Border Grid.Row="4" Style="{StaticResource Card}" Padding="14,10">
+                            <TabControl x:Name="ResultsTabs" Style="{StaticResource DarkTabControl}">
+                                <TabItem Header="  B站视频  ">
+                                    <DataGrid x:Name="BiliVideoGrid" Style="{StaticResource DarkDataGrid}"
+                                              MouseDoubleClick="OnBiliVideoDoubleClick">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="标题" Binding="{Binding Title}" Width="2*"/>
+                                            <DataGridTextColumn Header="UP主" Binding="{Binding Author}" Width="*"/>
+                                            <DataGridTextColumn Header="播放" Binding="{Binding Play}" Width="80"/>
+                                            <DataGridTextColumn Header="点赞" Binding="{Binding Like}" Width="80"/>
+                                            <DataGridTextColumn Header="回复" Binding="{Binding Reply}" Width="80"/>
+                                            <DataGridTextColumn Header="收藏" Binding="{Binding Favorites}" Width="80"/>
+                                            <DataGridTextColumn Header="发布时间" Binding="{Binding PubDate}" Width="145"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </TabItem>
+                                <TabItem Header="  B站评论  ">
+                                    <DataGrid x:Name="BiliCommentGrid" Style="{StaticResource DarkDataGrid}">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="用户" Binding="{Binding User}" Width="130"/>
+                                            <DataGridTextColumn Header="评论内容" Binding="{Binding Content}" Width="3*"/>
+                                            <DataGridTextColumn Header="点赞" Binding="{Binding Like}" Width="80"/>
+                                            <DataGridTextColumn Header="时间" Binding="{Binding Time}" Width="130"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </TabItem>
+                                <TabItem Header="  贴吧帖子  ">
+                                    <DataGrid x:Name="TiebaPostGrid" Style="{StaticResource DarkDataGrid}"
+                                              MouseDoubleClick="OnTiebaPostDoubleClick">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="标题" Binding="{Binding Title}" Width="2*"/>
+                                            <DataGridTextColumn Header="贴吧" Binding="{Binding Bar}" Width="130"/>
+                                            <DataGridTextColumn Header="作者" Binding="{Binding Author}" Width="120"/>
+                                            <DataGridTextColumn Header="回复数" Binding="{Binding ReplyCount}" Width="80"/>
+                                            <DataGridTextColumn Header="日期" Binding="{Binding Date}" Width="140"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </TabItem>
+                                <TabItem Header="  贴吧回复  ">
+                                    <DataGrid x:Name="TiebaReplyGrid" Style="{StaticResource DarkDataGrid}">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="用户" Binding="{Binding User}" Width="130"/>
+                                            <DataGridTextColumn Header="回复内容" Binding="{Binding Content}" Width="3*"/>
+                                            <DataGridTextColumn Header="楼层" Binding="{Binding Floor}" Width="70"/>
+                                            <DataGridTextColumn Header="时间" Binding="{Binding Time}" Width="130"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </TabItem>
+                                <TabItem Header="  ◈ 分析报告  ">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid Grid.Row="0" Margin="2,0,0,8">
+                                            <StackPanel Orientation="Horizontal">
+                                                <CheckBox x:Name="RenderPreviewCheck" Content="渲染预览"
+                                                          Style="{StaticResource DarkCheckBox}" IsChecked="True"
+                                                          Checked="OnRenderPreviewChanged"
+                                                          Unchecked="OnRenderPreviewChanged"
+                                                          VerticalAlignment="Center"/>
+                                                <Button Content="复制报告" Style="{StaticResource SecondaryButton}"
+                                                        Padding="12,4" Margin="16,0,0,0" Click="OnCopyReportClick"/>
+                                                <Button Content="历史归档" Style="{StaticResource SecondaryButton}"
+                                                        Padding="12,4" Margin="8,0,0,0" Click="OnOpenHistoryFolderClick"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                <TextBlock x:Name="RenderStatusText" Text="排版中…"
+                                                           FontSize="10.5" Foreground="{StaticResource WarningBrush}"
+                                                           VerticalAlignment="Center" Margin="0,0,10,0"
+                                                           Visibility="Collapsed"/>
+                                                <TextBlock x:Name="ReportCharsText" Text="0 字" FontSize="10.5"
+                                                           Foreground="{StaticResource TextMutedBrush}"
+                                                           VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <Grid Grid.Row="1">
+                                            <TextBox x:Name="RawReport" Style="{StaticResource DarkTextBoxScrollable}" VerticalContentAlignment="Top"
+                                                     Background="{StaticResource CardBrush}" BorderThickness="0"
+                                                     FontFamily="{StaticResource MonoFont}" FontSize="12.5"
+                                                     Padding="18,14" IsReadOnly="True" AcceptsReturn="True"
+                                                     TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                                                     HorizontalScrollBarVisibility="Disabled"/>
+                                            <FlowDocumentScrollViewer x:Name="ReportPreview" Visibility="Collapsed"
+                                                                      IsToolBarVisible="False"
+                                                                      Background="Transparent"
+                                                                      Padding="18,14"
+                                                                      VerticalScrollBarVisibility="Auto"
+                                                                      HorizontalScrollBarVisibility="Disabled"/>
+                                        </Grid>
+                                    </Grid>
+                                </TabItem>
+                            </TabControl>
+                        </Border>
+                    </Grid>
+
+                    <!-- ============ 设置页 ============ -->
+                    <ScrollViewer x:Name="SettingsPage" Visibility="Collapsed"
+                                  VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel Margin="24,16,24,28">
+                            <TextBlock Text="设置" Style="{StaticResource H1Text}"/>
+                            <TextBlock Text="配置 LLM API、Cookie、采集参数与请求节奏"
+                                       Foreground="{StaticResource TextMutedBrush}" FontSize="11.5"
+                                       Margin="0,4,0,14"/>
+
+                            <!-- LLM -->
+                            <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <TextBlock Text="LLM API 配置" Style="{StaticResource CardTitleText}"/>
+                                    <Grid Margin="0,12,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="110"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="API 地址" Style="{StaticResource FieldLabelText}"/>
+                                        <TextBox x:Name="ApiBaseBox" Grid.Row="0" Grid.Column="1"
+                                                 Style="{StaticResource DarkTextBox}" Height="34" Margin="0,0,0,8"
+                                                 VerticalContentAlignment="Center"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="API Key" Style="{StaticResource FieldLabelText}"/>
+                                        <PasswordBox x:Name="ApiKeyBox" Grid.Row="1" Grid.Column="1"
+                                                     Style="{StaticResource DarkPasswordBox}" Height="34"
+                                                     Margin="0,0,0,8" VerticalContentAlignment="Center"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="模型名" Style="{StaticResource FieldLabelText}"/>
+                                        <TextBox x:Name="ModelBox" Grid.Row="2" Grid.Column="1"
+                                                 Style="{StaticResource DarkTextBox}" Height="34"
+                                                 VerticalContentAlignment="Center"/>
+                                    </Grid>
+                                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                                        <TextBlock Text="快捷预设" Style="{StaticResource FieldLabelText}"
+                                                   Margin="0,0,8,0"/>
+                                        <Button Content="DeepSeek" Style="{StaticResource ChipButton}" Tag="https://api.deepseek.com/v1|deepseek-chat"
+                                                Click="OnPresetClick" Margin="0,0,4,0"/>
+                                        <Button Content="通义千问" Style="{StaticResource ChipButton}" Tag="https://dashscope.aliyuncs.com/compatible-mode/v1|qwen-plus"
+                                                Click="OnPresetClick" Margin="0,0,4,0"/>
+                                        <Button Content="OpenAI" Style="{StaticResource ChipButton}" Tag="https://api.openai.com/v1|gpt-4o-mini"
+                                                Click="OnPresetClick" Margin="0,0,4,0"/>
+                                        <Button Content="Moonshot" Style="{StaticResource ChipButton}" Tag="https://api.moonshot.cn/v1|moonshot-v1-8k"
+                                                Click="OnPresetClick"/>
+                                    </StackPanel>
+                                    <TextBlock Style="{StaticResource MutedText}" Margin="0,10,0,0"
+                                               Text="支持 OpenAI 兼容格式的任意 API。LLM 会通过函数调用自主采集数据并分析。"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- B站 Cookie -->
+                            <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <TextBlock Text="B站 Cookie" Style="{StaticResource CardTitleText}"/>
+                                    <Grid Margin="0,12,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="110"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="SESSDATA" Style="{StaticResource FieldLabelText}"/>
+                                        <TextBox x:Name="BiliSessBox" Grid.Row="0" Grid.Column="1"
+                                                 Style="{StaticResource DarkTextBox}" Height="34" Margin="0,0,0,8"
+                                                 VerticalContentAlignment="Center"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="bili_jct" Style="{StaticResource FieldLabelText}"/>
+                                        <TextBox x:Name="BiliJctBox" Grid.Row="1" Grid.Column="1"
+                                                 Style="{StaticResource DarkTextBox}" Height="34" Margin="0,0,0,8"
+                                                 VerticalContentAlignment="Center"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="DedeUserID" Style="{StaticResource FieldLabelText}"/>
+                                        <TextBox x:Name="BiliUidBox" Grid.Row="2" Grid.Column="1"
+                                                 Style="{StaticResource DarkTextBox}" Height="34"
+                                                 VerticalContentAlignment="Center"/>
+                                    </Grid>
+                                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                                        <Button Content="🔍 一键获取Cookie" Style="{StaticResource PrimaryButton}"
+                                                Padding="16,7" Click="OnFetchBilibiliCookieClick"/>
+                                        <Button Content="🌐 打开登录页" Style="{StaticResource SecondaryButton}"
+                                                Margin="8,0,0,0" Padding="14,7" Click="OnOpenBilibiliLoginClick"/>
+                                    </StackPanel>
+                                    <TextBlock Style="{StaticResource MutedText}" Margin="0,8,0,0"
+                                               Text="自动从本机 Chrome / Edge / Brave / Firefox 等浏览器提取；Chrome 127+ 应用绑定加密需手动粘贴。"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 贴吧 Cookie -->
+                            <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <TextBlock Text="贴吧 Cookie" Style="{StaticResource CardTitleText}"/>
+                                    <Grid Margin="0,12,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="110"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="BDUSS" Style="{StaticResource FieldLabelText}"/>
+                                        <TextBox x:Name="TiebaBdussBox" Grid.Row="0" Grid.Column="1"
+                                                 Style="{StaticResource DarkTextBox}" Height="34" Margin="0,0,0,8"
+                                                 VerticalContentAlignment="Center"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="STOKEN" Style="{StaticResource FieldLabelText}"/>
+                                        <TextBox x:Name="TiebaStokenBox" Grid.Row="1" Grid.Column="1"
+                                                 Style="{StaticResource DarkTextBox}" Height="34"
+                                                 VerticalContentAlignment="Center"/>
+                                    </Grid>
+                                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                                        <Button Content="🔍 一键获取Cookie" Style="{StaticResource PrimaryButton}"
+                                                Padding="16,7" Click="OnFetchTiebaCookieClick"/>
+                                        <Button Content="🌐 打开登录页" Style="{StaticResource SecondaryButton}"
+                                                Margin="8,0,0,0" Padding="14,7" Click="OnOpenTiebaLoginClick"/>
+                                        <Button Content="🩺 诊断贴吧连接" Style="{StaticResource SecondaryButton}"
+                                                Margin="8,0,0,0" Padding="14,7" Click="OnDiagnoseTiebaClick"/>
+                                    </StackPanel>
+                                    <TextBlock Style="{StaticResource MutedText}" Margin="0,8,0,0"
+                                               Text="贴吧采用移动端 / App 接口，无需登录即可采集；填写 BDUSS 可降低风控概率（可选）。"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 采集参数 -->
+                            <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <TextBlock Text="采集参数" Style="{StaticResource CardTitleText}"/>
+
+                                    <TextBlock Text="两阶段采集（先批量抓标题，本地筛出相关的再深挖评论区）"
+                                               FontSize="10.5" Foreground="{StaticResource TextMutedBrush}"
+                                               Margin="0,10,0,8"/>
+
+                                    <Grid Margin="0,0,0,8">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="B站搜索页数" Style="{StaticResource FieldLabelText}" Margin="0,0,5,0"/>
+                                            <controls:NumericBox x:Name="BiliPagesSetting" Width="58" Minimum="1" Maximum="10"
+                                                                 Value="2" Margin="0,0,16,0"/>
+                                            <TextBlock Text="每视频评论数" Style="{StaticResource FieldLabelText}" Margin="0,0,5,0"/>
+                                            <controls:NumericBox x:Name="BiliCommentsSetting" Width="64" Minimum="0" Maximum="100"
+                                                                 Value="30" Margin="0,0,16,0"/>
+                                            <TextBlock Text="贴吧搜索页数" Style="{StaticResource FieldLabelText}" Margin="0,0,5,0"/>
+                                            <controls:NumericBox x:Name="TiebaPagesSetting" Width="58" Minimum="1" Maximum="10"
+                                                                 Value="3" Margin="0,0,16,0"/>
+                                            <TextBlock Text="每帖子回复数" Style="{StaticResource FieldLabelText}" Margin="0,0,5,0"/>
+                                            <controls:NumericBox x:Name="TiebaRepliesSetting" Width="64" Minimum="0" Maximum="100"
+                                                                 Value="20"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,8">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="时效窗口" Style="{StaticResource FieldLabelText}" Margin="0,0,8,0"/>
+                                            <controls:NumericBox x:Name="SettingsWinYears" Width="56" Minimum="0" Maximum="10"
+                                                                 Value="0" Suffix="年" Margin="0,0,5,0"
+                                                                 ValueChanged="OnSettingsTimeWindowValueChanged"/>
+                                            <controls:NumericBox x:Name="SettingsWinMonths" Width="56" Minimum="0" Maximum="23"
+                                                                 Value="0" Suffix="月" Margin="0,0,5,0"
+                                                                 ValueChanged="OnSettingsTimeWindowValueChanged"/>
+                                            <controls:NumericBox x:Name="SettingsWinDays" Width="62" Minimum="0" Maximum="365"
+                                                                 Value="90" Suffix="天" Margin="0,0,5,0"
+                                                                 ValueChanged="OnSettingsTimeWindowValueChanged"/>
+                                            <controls:NumericBox x:Name="SettingsWinHours" Width="66" Minimum="0" Maximum="23"
+                                                                 Value="0" Suffix="时" Margin="0,0,10,0"
+                                                                 ValueChanged="OnSettingsTimeWindowValueChanged"/>
+                                            <TextBlock x:Name="SettingsTimeWindowLabel" Text="当前：近 90 天"
+                                                       Foreground="{StaticResource SuccessBrush}" FontSize="10.5"
+                                                       VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                            <Button Content="不限" Style="{StaticResource ChipButton}" Tag="0,0,0,0"
+                                                    Click="OnQuickWindowClick" Margin="0,0,4,0"/>
+                                            <Button Content="24 小时" Style="{StaticResource ChipButton}" Tag="0,0,1,0"
+                                                    Click="OnQuickWindowClick" Margin="0,0,4,0"/>
+                                            <Button Content="7 天" Style="{StaticResource ChipButton}" Tag="0,0,7,0"
+                                                    Click="OnQuickWindowClick" Margin="0,0,4,0"/>
+                                            <Button Content="30 天" Style="{StaticResource ChipButton}" Tag="0,0,30,0"
+                                                    Click="OnQuickWindowClick" Margin="0,0,4,0"/>
+                                            <Button Content="90 天" Style="{StaticResource ChipButton}" Tag="0,0,90,0"
+                                                    Click="OnQuickWindowClick" Margin="0,0,4,0"/>
+                                            <Button Content="1 年" Style="{StaticResource ChipButton}" Tag="1,0,0,0"
+                                                    Click="OnQuickWindowClick"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,8">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="深挖B站视频" Style="{StaticResource FieldLabelText}" Margin="0,0,5,0"/>
+                                            <controls:NumericBox x:Name="DeepBiliSetting" Width="56" Minimum="0" Maximum="10"
+                                                                 Value="4" Margin="0,0,16,0"/>
+                                            <TextBlock Text="深挖贴吧帖子" Style="{StaticResource FieldLabelText}" Margin="0,0,5,0"/>
+                                            <controls:NumericBox x:Name="DeepTiebaSetting" Width="56" Minimum="0" Maximum="10"
+                                                                 Value="4" Margin="0,0,16,0"/>
+                                            <TextBlock Text="检索变体数" Style="{StaticResource FieldLabelText}" Margin="0,0,5,0"/>
+                                            <controls:NumericBox x:Name="VariantsSetting" Width="56" Minimum="1" Maximum="4"
+                                                                 Value="3"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Grid Margin="0,2,0,0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="贴吧搜索排序" Style="{StaticResource FieldLabelText}" Margin="0,0,10,0"/>
+                                            <RadioButton x:Name="SortHot" Content="按热度（推荐）" Style="{StaticResource DarkRadioButton}"
+                                                         GroupName="Sort" IsChecked="True"/>
+                                            <RadioButton x:Name="SortRelevance" Content="按相关度" Style="{StaticResource DarkRadioButton}"
+                                                         GroupName="Sort"/>
+                                            <RadioButton x:Name="SortTime" Content="按时间" Style="{StaticResource DarkRadioButton}"
+                                                         GroupName="Sort"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Grid Margin="0,8,0,0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <CheckBox x:Name="HotFirstCheck" Content="优先检索贴吧热榜（热点榜单话题下的帖子）"
+                                                      Style="{StaticResource DarkCheckBox}" IsChecked="True"
+                                                      Margin="0,0,16,0"/>
+                                            <TextBlock Text="热榜话题数" Style="{StaticResource FieldLabelText}" Margin="0,0,5,0"/>
+                                            <controls:NumericBox x:Name="HotTopicsSetting" Width="52" Minimum="1" Maximum="3"
+                                                                 Value="2" Suffix="个"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <TextBlock Text="贴吧请求节奏（重要）" FontSize="10.5"
+                                               Foreground="{StaticResource AccentHoverBrush}" FontWeight="SemiBold"
+                                               Margin="0,12,0,6"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="请求间隔" Style="{StaticResource FieldLabelText}" Margin="0,0,5,0"/>
+                                        <controls:NumericBox x:Name="IntervalSetting" Width="66" Minimum="1" Maximum="60"
+                                                             Value="3" Step="0.5" Decimals="1" Suffix="秒" Margin="0,0,16,0"/>
+                                        <TextBlock Text="随机抖动" Style="{StaticResource FieldLabelText}" Margin="0,0,5,0"/>
+                                        <controls:NumericBox x:Name="JitterSetting" Width="66" Minimum="0" Maximum="10"
+                                                             Value="2" Step="0.5" Decimals="1" Suffix="秒" Margin="0,0,16,0"/>
+                                        <TextBlock Text="风控冷却" Style="{StaticResource FieldLabelText}" Margin="0,0,5,0"/>
+                                        <controls:NumericBox x:Name="CooldownSetting" Width="72" Minimum="10" Maximum="600"
+                                                             Value="60" Step="5" Suffix="秒"/>
+                                    </StackPanel>
+
+                                    <TextBlock Style="{StaticResource MutedText}" Margin="0,10,0,0"
+                                               Text="「请求间隔」是贴吧两次请求之间的基础停顿（实际在间隔 + 抖动区间内随机），间隔越小越容易被风控。&#10;「时效窗口」对 B站与贴吧同时生效，结果不足时会自动放宽并如实说明。&#10;「深挖」决定抓多少个视频/帖子的评论区，每个对象消耗一次请求。"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 操作 -->
+                            <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="💾 保存配置" Style="{StaticResource PrimaryButton}"
+                                            Padding="20,9" Click="OnSaveConfigClick"/>
+                                    <Button Content="测试 B站" Style="{StaticResource SecondaryButton}"
+                                            Margin="8,0,0,0" Padding="16,9" Click="OnTestBilibiliClick"/>
+                                    <Button Content="测试 贴吧" Style="{StaticResource SecondaryButton}"
+                                            Margin="8,0,0,0" Padding="16,9" Click="OnTestTiebaClick"/>
+                                    <Button Content="测试 LLM" Style="{StaticResource SecondaryButton}"
+                                            Margin="8,0,0,0" Padding="16,9" Click="OnTestLlmClick"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 运行日志 -->
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <Grid>
+                                        <TextBlock Text="运行日志" Style="{StaticResource CardTitleText}"/>
+                                        <Button Content="清空" Style="{StaticResource LinkButton}"
+                                                HorizontalAlignment="Right" Click="OnClearLogClick"/>
+                                    </Grid>
+                                    <TextBox x:Name="LogBox" Height="150" VerticalContentAlignment="Top" Margin="0,8,0,0"
+                                             IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap"
+                                             VerticalScrollBarVisibility="Auto"
+                                             Background="{StaticResource BgBrush}"
+                                             BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                                             Foreground="{StaticResource TextDimBrush}"
+                                             FontFamily="{StaticResource MonoFont}" FontSize="11"
+                                             Padding="10,8"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- ============ 历史页 ============ -->
+                    <Grid x:Name="HistoryPage" Visibility="Collapsed" Margin="24,16,24,12">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0" Margin="0,0,0,12">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                                <TextBlock Text="历史归档" Style="{StaticResource H1Text}"/>
+                                <TextBlock Text="每次分析自动保存报告与原始数据到 ~/.sonar/history"
+                                           Foreground="{StaticResource TextMutedBrush}" FontSize="11.5"
+                                           Margin="14,0,0,3" VerticalAlignment="Bottom"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Content="刷新" Style="{StaticResource SecondaryButton}"
+                                        Padding="14,7" Click="OnRefreshHistoryClick"/>
+                                <Button Content="打开归档目录" Style="{StaticResource PrimaryButton}"
+                                        Margin="8,0,0,0" Padding="16,7" Click="OnOpenHistoryFolderClick"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="340"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0" Style="{StaticResource Card}" Padding="8">
+                                <ListBox x:Name="HistoryList" SelectionChanged="OnHistorySelectionChanged"
+                                         ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Margin="2,3">
+                                                <TextBlock Text="{Binding Title}" FontSize="12.5"
+                                                           Foreground="{StaticResource TextBrush}"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                                <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                                                    <TextBlock Text="{Binding TimeText}" FontSize="10.5"
+                                                               Foreground="{StaticResource TextMutedBrush}"/>
+                                                    <TextBlock Text="{Binding Mode}" FontSize="10.5"
+                                                               Foreground="{StaticResource AccentHoverBrush}"
+                                                               Margin="8,0,0,0"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </Border>
+
+                            <Border Grid.Column="2" Style="{StaticResource Card}" Padding="0">
+                                <Grid>
+                                    <FlowDocumentScrollViewer x:Name="HistoryPreview"
+                                                              IsToolBarVisible="False"
+                                                              Background="Transparent" Padding="20,16"
+                                                              VerticalScrollBarVisibility="Auto"
+                                                              HorizontalScrollBarVisibility="Disabled"/>
+                                    <TextBlock x:Name="HistoryEmptyText"
+                                               Text="从左侧选择一条归档记录查看报告"
+                                               Foreground="{StaticResource TextMutedBrush}" FontSize="12"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Grid>
+
+            <!-- ================= 状态栏 ================= -->
+            <Border Grid.Row="2" Background="{StaticResource SidebarBrush}"
+                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0">
+                <Grid>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0">
+                        <Ellipse x:Name="StatusDot" Width="7" Height="7"
+                                 Fill="{StaticResource SuccessBrush}" Margin="0,0,8,0"/>
+                        <TextBlock x:Name="StatusText" Text="● 就绪" FontSize="10.5"
+                                   Foreground="{StaticResource TextDimBrush}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
+                                VerticalAlignment="Center" Margin="0,0,16,0">
+                        <TextBlock x:Name="FooterUsageText" Text="" FontSize="10.5"
+                                   Foreground="{StaticResource TextMutedBrush}"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- ================= Toast ================= -->
+            <Border x:Name="ToastHost" Grid.RowSpan="3" Panel.ZIndex="99"
+                    HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                    Margin="0,0,0,46" Background="{StaticResource CardBrush}"
+                    BorderBrush="{StaticResource AccentBorderBrush}" BorderThickness="1"
+                    CornerRadius="9" Padding="18,10" Visibility="Collapsed"
+                    IsHitTestVisible="False" Opacity="0">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="✓" Foreground="{StaticResource SuccessBrush}" FontWeight="Bold"
+                               Margin="0,0,8,0" FontSize="13"/>
+                    <TextBlock x:Name="ToastText" Text="" FontSize="12"
+                               Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Sonar</RootNamespace>
+    <AssemblyName>Sonar</AssemblyName>
+    <AssemblyTitle>声呐 Sonar</AssemblyTitle>
+    <Product>声呐 Sonar — B站 &amp; 贴吧 舆情分析</Product>
+    <Version>0.3.0</Version>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\sonar.ico</ApplicationIcon>
+    <SatelliteResourceLanguages>zh-Hans;en</SatelliteResourceLanguages>
+    <InvariantGlobalization>false</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\sonar.ico" />
+    <Resource Include="Assets\sonar.ico" />
+    <Resource Include="Assets\sonar.png" />
+  </ItemGroup>
+
+</Project>
